@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/pbauer95/bookings/pkg/config"
-	"github.com/pbauer95/bookings/pkg/models"
-	"github.com/pbauer95/bookings/pkg/render"
+	"github.com/pbauer95/bookings/internal/config"
+	"github.com/pbauer95/bookings/internal/models"
+	"github.com/pbauer95/bookings/internal/render"
 )
 
 // Repository is the repository type
@@ -82,4 +82,9 @@ func (repo *Repository) PostAvailability(w http.ResponseWriter, r *http.Request)
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
 	w.Write([]byte(fmt.Sprintf("Posted to search availability. Values: %s and %s", start, end)))
+}
+
+// Majors renders the search availability page
+func (repo *Repository) PostAvailabilityJson(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("test"))
 }
