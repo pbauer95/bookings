@@ -50,3 +50,28 @@ func (repo *Repository) About(w http.ResponseWriter, r *http.Request) {
 		StringMap: stringMap,
 	})
 }
+
+// Contact renders the contact page
+func (repo *Repository) Contact(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "contact.page.tmpl", &models.TemplateData{})
+}
+
+// Reservation renders the 'make a reservation' page and displays a form
+func (repo *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "make-reservation.page.tmpl", &models.TemplateData{})
+}
+
+// Generals renders the room page
+func (repo *Repository) Generals(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "generals.page.tmpl", &models.TemplateData{})
+}
+
+// Majors renders the major rooms page
+func (repo *Repository) Majors(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "majors.page.tmpl", &models.TemplateData{})
+}
+
+// Majors renders the search availability page
+func (repo *Repository) Availability(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "search-availability.page.tmpl", &models.TemplateData{})
+}
