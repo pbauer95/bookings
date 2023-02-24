@@ -22,6 +22,23 @@ var sessionManager *scs.SessionManager
 
 // main is the main application function
 func main() {
+	err := run()
+
+	if err != nil {
+		log.Fatal("Error setting up the application")
+	}
+
+	fmt.Printf(fmt.Sprintf("Starting application on port %s", portNumber))
+
+	serve := &http.Server{
+		Addr:    portNumber,
+		Handler: routes(&app),
+	}
+
+	_ = serve.ListenAndServe()
+}
+
+func run() error {
 	gob.Register(models.Reservation{})
 
 	//change this to true if in production
@@ -39,6 +56,7 @@ func main() {
 
 	if err != nil {
 		log.Fatal("Cannot create template cache")
+		return err
 	}
 
 	app.TemplateCache = templateCache
@@ -48,13 +66,5 @@ func main() {
 	handlers.NewHandlers(repo)
 
 	render.NewTemplate(&app)
-
-	fmt.Printf(fmt.Sprintf("Starting application on port %s", portNumber))
-
-	serve := &http.Server{
-		Addr:    portNumber,
-		Handler: routes(&app),
-	}
-
-	_ = serve.ListenAndServe()
+	return nil
 }
