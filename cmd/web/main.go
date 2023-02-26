@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/pbauer95/bookings/internal/config"
 	"github.com/pbauer95/bookings/internal/handlers"
+	"github.com/pbauer95/bookings/internal/helpers"
 	"github.com/pbauer95/bookings/internal/models"
 	"github.com/pbauer95/bookings/internal/render"
 
@@ -44,6 +46,9 @@ func run() error {
 	//change this to true if in production
 	app.Production = false
 
+	app.InfoLog = log.New(os.Stdout, "[INFO]\t", log.Ldate|log.Ltime)
+	app.ErrorLog = log.New(os.Stdout, "[ERROR]\t", log.Ldate|log.Ltime|log.Lshortfile)
+
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
 	sessionManager.Cookie.Persist = true
@@ -64,7 +69,8 @@ func run() error {
 
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
-
+	helpers.NewHelpers(&app)
 	render.NewTemplate(&app)
+	
 	return nil
 }

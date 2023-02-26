@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/pbauer95/bookings/internal/config"
 	"github.com/pbauer95/bookings/internal/forms"
+	"github.com/pbauer95/bookings/internal/helpers"
 	"github.com/pbauer95/bookings/internal/models"
 	"github.com/pbauer95/bookings/internal/render"
 )
@@ -33,25 +33,12 @@ func NewHandlers(r *Repository) {
 
 // Home is the home page handler
 func (repo *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	remoteIp := r.RemoteAddr
-	repo.App.SessionManager.Put(r.Context(), "remote_ip", remoteIp)
-
 	render.RenderTemplate(w, r, "home.page.tmpl", &models.TemplateData{})
 }
 
 // About is the about page handler
 func (repo *Repository) About(w http.ResponseWriter, r *http.Request) {
-	// Perform somr logic
-	stringMap := map[string]string{
-		"test": "Hello again!",
-	}
-
-	stringMap["remote_ip"] = repo.App.SessionManager.GetString(r.Context(), "remote_ip")
-
-	//send the data to the template
-	render.RenderTemplate(w, r, "about.page.tmpl", &models.TemplateData{
-		StringMap: stringMap,
-	})
+	render.RenderTemplate(w, r, "about.page.tmpl", &models.TemplateData{})
 }
 
 // Contact renders the contact page
@@ -78,7 +65,7 @@ func (repo *Repository) PostReservation(w http.ResponseWriter, r *http.Request) 
 	err := r.ParseForm()
 
 	if err != nil {
-		log.Println(err)
+		helpers.ServerError(w, err)
 		return
 	}
 
@@ -144,7 +131,7 @@ func (repo *Repository) ReservationSummary(w http.ResponseWriter, r *http.Reques
 	reservation, ok := repo.App.SessionManager.Get(r.Context(), "reservation").(models.Reservation)
 
 	if !ok {
-		log.Println("Could not get data from session")
+		repo.App.ErrorLog.Println("Can't get error from session")
 		repo.App.SessionManager.Put(r.Context(), "error", "Can't get reservation from session")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return

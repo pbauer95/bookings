@@ -6,20 +6,8 @@ import (
 	"testing"
 )
 
-// func TestNew(t *testing.T) {
-// 	values := url.Values{}
-
-// 	form := New(values)
-
-// 	switch form.(type) {
-// 	case Form:
-
-// 	}
-// }
-
 func TestForm_Required(t *testing.T) {
-	r := httptest.NewRequest("POST", "/whatever", nil)
-	form := New(r.PostForm)
+	form := New(url.Values{})
 
 	form.Required("a", "b", "c")
 
@@ -33,8 +21,7 @@ func TestForm_Required(t *testing.T) {
 		"c": {"c"},
 	}
 
-	r.PostForm = postedData
-	form = New(r.PostForm)
+	form = New(postedData)
 	form.Required("a", "b", "c")
 
 	if !form.Valid() {
@@ -43,8 +30,7 @@ func TestForm_Required(t *testing.T) {
 }
 
 func TestForm_Valid(t *testing.T) {
-	r := httptest.NewRequest("POST", "/whatever", nil)
-	form := New(r.PostForm)
+	form := New(url.Values{})
 
 	isValid := form.Valid()
 
