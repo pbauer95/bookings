@@ -1,7 +1,6 @@
 package render
 
 import (
-	"log"
 	"net/http"
 	"testing"
 
@@ -33,8 +32,6 @@ func getSession() (*http.Request, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	log.Println(r)
 
 	ctx := r.Context()
 	ctx, err = sessionManager.Load(ctx, r.Header.Get("X-Session"))
