@@ -12,6 +12,20 @@ import (
 	"github.com/pbauer95/bookings/internal/models"
 )
 
+type myWriter struct{}
+
+func (w *myWriter) Header() http.Header {
+	var h http.Header
+	return h
+}
+
+func (w *myWriter) WriteHeader(i int) {}
+
+func (w *myWriter) Write(b []byte) (int, error) {
+	length := len(b)
+	return length, nil
+}
+
 var sessionManager *scs.SessionManager
 var testApp config.AppConfig
 

@@ -2,7 +2,6 @@ package forms
 
 import (
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 
@@ -35,8 +34,8 @@ func (f *Form) Required(fields ...string) {
 }
 
 // Has checks if form field is in post and not empty
-func (f *Form) Has(field string, r *http.Request) bool {
-	return r.Form.Get(field) != ""
+func (f *Form) Has(field string) bool {
+	return f.Get(field) != ""
 }
 
 // Valid returns true if there are no errors, otherwise false

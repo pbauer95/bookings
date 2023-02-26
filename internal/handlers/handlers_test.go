@@ -62,6 +62,12 @@ var tests = []struct {
 		[]postData{},
 		http.StatusOK,
 	}, {
+		"reservation-summary",
+		"/reservation-summary",
+		"GET",
+		[]postData{},
+		http.StatusOK,
+	}, {
 		"post-search-availability",
 		"/search-availability",
 		"POST",
