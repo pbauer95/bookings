@@ -14,9 +14,10 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/justinas/nosurf"
+	"github.com/pbauer95/bookings/entities"
 	"github.com/pbauer95/bookings/internal/config"
-	"github.com/pbauer95/bookings/internal/models"
 	"github.com/pbauer95/bookings/internal/render"
+	dbRepo "github.com/pbauer95/bookings/internal/repository"
 )
 
 var app config.AppConfig
@@ -25,13 +26,21 @@ var pathToTemplates = "./../../templates"
 var functions = template.FuncMap{}
 
 func getRoutes() http.Handler {
-	gob.Register(models.Reservation{})
+	gob.Register(entities.Reservation{})
 
 	//change this to true if in production
 	app.Production = false
 
 	app.InfoLog = log.New(os.Stdout, "[INFO]\t", log.Ldate|log.Ltime)
 	app.ErrorLog = log.New(os.Stdout, "[ERROR]\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	dbRepo, err := dbRepo.InitializeDb()
+
+	if err != nil {
+		panic(err)
+	}
+
+	app.Repo = dbRepo
 
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour

@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
+	"github.com/pbauer95/bookings/entities"
 	"github.com/pbauer95/bookings/internal/config"
-	"github.com/pbauer95/bookings/internal/models"
 )
 
 type myWriter struct{}
@@ -31,7 +31,7 @@ var sessionManager *scs.SessionManager
 var testApp config.AppConfig
 
 func TestMain(m *testing.M) {
-	gob.Register(models.Reservation{})
+	gob.Register(entities.Reservation{})
 
 	//change this to true if in production
 	testApp.Production = false

@@ -1,9 +1,11 @@
 package handlers
 
 import (
-	"fmt"
+	"database/sql"
+	"encoding/json"
 	"net/http"
 
+	"github.com/pbauer95/bookings/entities"
 	"github.com/pbauer95/bookings/internal/config"
 	"github.com/pbauer95/bookings/internal/forms"
 	"github.com/pbauer95/bookings/internal/helpers"
@@ -48,7 +50,7 @@ func (repo *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 
 // Reservation renders the 'make a reservation' page and displays a form
 func (repo *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	var emptyReservation models.Reservation
+	var emptyReservation entities.Reservation
 
 	data := map[string]interface{}{
 		"reservation": emptyReservation,
@@ -69,11 +71,16 @@ func (repo *Repository) PostReservation(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	reservation := models.Reservation{
-		FirstName: r.Form.Get("first_name"),
-		LastName:  r.Form.Get("last_name"),
-		Phone:     r.Form.Get("phone"),
-		Email:     r.Form.Get("email"),
+	reservation := entities.Reservation{
+		User: entities.User{
+			FirstName: r.Form.Get("first_name"),
+			LastName:  r.Form.Get("last_name"),
+			Email:     r.Form.Get("email"),
+		},
+		Phone: sql.NullString{
+			String: r.Form.Get("phone"),
+			Valid:  true,
+		},
 	}
 
 	form := forms.New(r.PostForm)
@@ -117,9 +124,12 @@ func (repo *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 
 // Majors renders the search availability page
 func (repo *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
-	start := r.Form.Get("start")
-	end := r.Form.Get("end")
-	w.Write([]byte(fmt.Sprintf("Posted to search availability. Values: %s and %s", start, end)))
+	var user entities.User
+	repo.App.Repo.Connection.First(&user, 1)
+
+	res, _ := json.Marshal(user)
+
+	w.Write(res)
 }
 
 // Majors renders the search availability page
@@ -128,7 +138,7 @@ func (repo *Repository) PostAvailabilityJson(w http.ResponseWriter, r *http.Requ
 }
 
 func (repo *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
-	reservation, ok := repo.App.SessionManager.Get(r.Context(), "reservation").(models.Reservation)
+	reservation, ok := repo.App.SessionManager.Get(r.Context(), "reservation").(entities.Reservation)
 
 	if !ok {
 		repo.App.ErrorLog.Println("Can't get error from session")

@@ -8,11 +8,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/pbauer95/bookings/entities"
 	"github.com/pbauer95/bookings/internal/config"
 	"github.com/pbauer95/bookings/internal/handlers"
 	"github.com/pbauer95/bookings/internal/helpers"
-	"github.com/pbauer95/bookings/internal/models"
 	"github.com/pbauer95/bookings/internal/render"
+	"github.com/pbauer95/bookings/internal/repository"
 
 	"github.com/alexedwards/scs/v2"
 )
@@ -24,11 +25,7 @@ var sessionManager *scs.SessionManager
 
 // main is the main application function
 func main() {
-	err := run()
-
-	if err != nil {
-		log.Fatal("Error setting up the application")
-	}
+	checkError(run())
 
 	fmt.Printf(fmt.Sprintf("Starting application on port %s", portNumber))
 
@@ -41,13 +38,21 @@ func main() {
 }
 
 func run() error {
-	gob.Register(models.Reservation{})
+	gob.Register(entities.Reservation{})
 
 	//change this to true if in production
 	app.Production = false
 
 	app.InfoLog = log.New(os.Stdout, "[INFO]\t", log.Ldate|log.Ltime)
 	app.ErrorLog = log.New(os.Stdout, "[ERROR]\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	dbRepo, err := Repo.InitializeDb()
+
+	if err != nil {
+		panic(err)
+	}
+
+	app.Repo = dbRepo
 
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
@@ -67,10 +72,16 @@ func run() error {
 	app.TemplateCache = templateCache
 	app.UseCache = false
 
-	repo := handlers.NewRepo(&app)
-	handlers.NewHandlers(repo)
+	handlerRepo := handlers.NewRepo(&app)
+	handlers.NewHandlers(handlerRepo)
 	helpers.NewHelpers(&app)
 	render.NewTemplate(&app)
-	
+
 	return nil
+}
+
+func checkError(err error) {
+	if err != nil {
+		app.ErrorLog.Fatal(err)
+	}
 }
